@@ -2,7 +2,7 @@
  * @Author: TOTHTOT 37585883+TOTHTOT@users.noreply.github.com
  * @Date: 2025-04-22 09:07:56
  * @LastEditors: TOTHTOT 37585883+TOTHTOT@users.noreply.github.com
- * @LastEditTime: 2025-04-22 14:42:51
+ * @LastEditTime: 2025-04-22 17:59:05
  * @FilePath: \lv_port_pc_visual_studio\LvglWindowsSimulator\LvglWindowsSimulator.cpp
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -24,7 +24,7 @@ static lv_style_t style_bold;
 #define WEATHER_LAYOUT_WIDTH_PCT 50
 
 // 封装状态栏创建
-static lv_obj_t* create_status_bar(lv_obj_t* parent)
+static lv_obj_t* create_status_bar(lv_obj_t *up, lv_obj_t* parent, lv_obj_t* down)
 {
     lv_obj_t* status_bar = lv_obj_create(parent);
     lv_obj_set_flex_flow(status_bar, LV_FLEX_FLOW_ROW);
@@ -34,6 +34,7 @@ static lv_obj_t* create_status_bar(lv_obj_t* parent)
     lv_obj_set_style_radius(status_bar, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_scrollbar_mode(status_bar, LV_SCROLLBAR_MODE_OFF);
     lv_obj_set_style_border_width(status_bar, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_align_to(status_bar, parent, LV_ALIGN_BOTTOM_MID, 0, 0);
 
     lv_obj_t* sub_cont[3];
     for (int i = 0; i < 3; i++) {
@@ -132,7 +133,7 @@ static void create_weather_layout(lv_obj_t *up, lv_obj_t* parent, lv_obj_t* down
     lv_obj_set_style_border_width(cont, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_radius(cont, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_scrollbar_mode(cont, LV_SCROLLBAR_MODE_OFF);
-    lv_obj_align_to(cont, up, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
+    // lv_obj_align_to(cont, up, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
 
     for (int i = 0; i < 2; i++) {
         lv_obj_t* weather_cont = lv_obj_create(cont);
@@ -145,12 +146,63 @@ static void create_weather_layout(lv_obj_t *up, lv_obj_t* parent, lv_obj_t* down
     }
 }
 
+void tabview_create(lv_obj_t* parent)
+{
+    lv_obj_t* tabview = lv_tabview_create(parent);
+    lv_obj_set_size(tabview, LV_PCT(100), LV_SIZE_CONTENT);
+    lv_obj_set_style_pad_all(tabview, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(tabview, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(tabview, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_scrollbar_mode(tabview, LV_SCROLLBAR_MODE_OFF);
+    // 获取 TabView 的按钮容器
+    lv_obj_t *tab_btns = lv_tabview_get_tab_btns(tabview);
+
+    // 减小导航栏高度
+    lv_obj_set_style_pad_ver(tab_btns, 5, LV_PART_MAIN | LV_STATE_DEFAULT);      // 设置垂直内边距为 5 像素
+    lv_obj_set_style_pad_hor(tab_btns, 0, LV_PART_MAIN | LV_STATE_DEFAULT);      // 水平内边距保持为 0
+    lv_obj_set_style_border_width(tab_btns, 0, LV_PART_MAIN | LV_STATE_DEFAULT); // 去掉边框
+
+    // 创建标签页
+    lv_obj_t* tab1 = lv_tabview_add_tab(tabview, "Tab 1");
+    lv_obj_t* tab2 = lv_tabview_add_tab(tabview, "Tab 2");
+
+    create_weather_layout(NULL, tab1, NULL);
+    // // 在标签页中添加内容
+    // lv_obj_t* label1 = lv_label_create(tab1);
+    // lv_label_set_text(label1, "This is Tab 1 content.");
+
+    lv_obj_t* label2 = lv_label_create(tab2);
+    lv_label_set_text(label2, "This is Tab 2 content.");
+}
+lv_obj_t *create_tabview_layout(lv_obj_t *up, lv_obj_t* parent, lv_obj_t* down)
+{
+    // 创建底部布局容器
+    lv_obj_t* bottom_layout = lv_obj_create(parent);
+    lv_obj_set_size(bottom_layout, LV_PCT(100), LV_PCT(80)); // 宽度全屏，高度自适应
+    lv_obj_set_style_pad_all(bottom_layout, 0, LV_PART_MAIN | LV_STATE_DEFAULT); // 去掉内边距
+    lv_obj_set_style_border_width(bottom_layout, 0, LV_PART_MAIN | LV_STATE_DEFAULT); // 去掉边框
+    lv_obj_set_style_radius(bottom_layout, 0, LV_PART_MAIN | LV_STATE_DEFAULT); // 去掉圆角
+    lv_obj_set_scrollbar_mode(bottom_layout, LV_SCROLLBAR_MODE_OFF); // 禁用滚动条
+    lv_obj_align(bottom_layout, LV_ALIGN_TOP_MID, 0, 0); // 对齐到屏幕底部
+
+    // // 在底部布局中添加内容（示例）
+    // lv_obj_t* label = lv_label_create(bottom_layout);
+    // lv_label_set_text(label, "This is the bottom layout.");
+    // lv_obj_align(label, LV_ALIGN_CENTER, 0, 0); // 居中对齐
+
+    tabview_create(bottom_layout);
+
+    return bottom_layout;
+}
 // 主页面
 void main_page(void)
 {
     lv_obj_t* screen = lv_scr_act();
-    lv_obj_t* status_bar = create_status_bar(screen);
-    create_weather_layout(status_bar, screen, NULL);
+    
+    lv_obj_t *tabview = create_tabview_layout(NULL, screen, NULL);
+    lv_obj_t* status_bar = create_status_bar(NULL, screen, NULL);
+    
+
 }
 
 int main()
